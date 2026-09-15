@@ -15,6 +15,10 @@ export class ApiError extends Error {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE_URL}${path}`, {
     ...init,
+    // La sesion viaja en una cookie httpOnly (access_token) que pone
+    // themis-core en /auth/login; el navegador la adjunta solo. No hay
+    // Authorization header que armar aqui.
+    credentials: 'include',
     headers: {
       'content-type': 'application/json',
       ...init?.headers,
