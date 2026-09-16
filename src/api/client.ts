@@ -42,6 +42,12 @@ export const api = {
       method: 'POST',
       body: body === undefined ? undefined : JSON.stringify(body),
     }),
+  patch: <T>(path: string, body?: unknown) =>
+    request<T>(path, {
+      method: 'PATCH',
+      body: body === undefined ? undefined : JSON.stringify(body),
+    }),
+  delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
 };
 
 export const apiBaseUrl = BASE_URL;
