@@ -103,6 +103,7 @@ precaución teórica.
 | `/login` | Administrador / Autoridad de Registro / Auditor | Implementada (HU00_1) |
 | `/demo` | Cualquier cuenta de plataforma logueada | Implementada, en `routes/_authenticated/` |
 | `/admin/*` | Autoridades electorales | Prevista — va en `routes/_authenticated/admin/` |
+| `/admin/users` | Superusuario | Implementada — crea cuentas de ADMIN/AUTORIDAD_REGISTRO/AUDITOR |
 | `/vote/*` | Votantes por navegador | Prevista, sin implementar |
 | `/prove` | Pagina headless que consume el WebView de themis-app | Prevista, sin implementar |
 

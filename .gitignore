@@ -27,3 +27,4 @@ Thumbs.db
 
 # Generado por @tanstack/router-plugin a partir de src/routes/**
 src/routeTree.gen.ts
+README.md

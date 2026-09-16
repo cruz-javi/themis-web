@@ -4,7 +4,11 @@
 // TODO: reemplazar por tipos generados cuando se instale openapi-typescript
 // (HU00_1, Fase 1 de la hoja de ruta).
 
-export type PlatformRole = 'ADMIN' | 'AUTORIDAD_REGISTRO' | 'AUDITOR';
+export type PlatformRole =
+  | 'ADMIN'
+  | 'AUTORIDAD_REGISTRO'
+  | 'AUDITOR'
+  | 'SUPERUSUARIO';
 
 /** Respuesta de POST /auth/login. El JWT viaja en una cookie httpOnly
  * (access_token), nunca en este body — el frontend no tiene ni necesita
