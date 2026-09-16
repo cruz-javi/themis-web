@@ -73,9 +73,9 @@ export function CreateUserPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md items-center p-6">
+    <div className="mx-auto max-w-md">
       <div className="w-full">
-        <h1 className="mb-6 text-center text-2xl font-bold text-slate-900">
+        <h1 className="mb-6 text-2xl font-bold text-slate-900">
           Themis - Crear cuenta de plataforma
         </h1>
         <Card>
@@ -176,6 +176,6 @@ export function CreateUserPage() {
           </CardContent>
         </Card>
       </div>
-    </main>
+    </div>
   );
 }

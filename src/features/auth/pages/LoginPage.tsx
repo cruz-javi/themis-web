@@ -25,7 +25,7 @@ export function LoginPage() {
   function onSubmit(values: LoginFormValues) {
     login.mutate(values, {
       onSuccess: () => {
-        void navigate({ to: '/demo' });
+        void navigate({ to: '/dashboard' });
       },
     });
   }
