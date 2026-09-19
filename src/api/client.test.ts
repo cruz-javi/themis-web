@@ -42,4 +42,27 @@ describe('api client', () => {
     expect(error).toBeInstanceOf(ApiError);
     expect((error as ApiError).status).toBe(409);
   });
+
+  it('expone el code del cuerpo de error de themis-core en ApiError.code', async () => {
+    stubFetch(
+      new Response(JSON.stringify({ code: 'BATCH_ALREADY_APPROVED_BY_AUTHORITY', message: 'x' }), {
+        status: 409,
+      }),
+    );
+
+    const error = await api.post<void>('/elections/e/batches/b/approvals').catch((e: unknown) => e);
+
+    expect((error as ApiError).code).toBe('BATCH_ALREADY_APPROVED_BY_AUTHORITY');
+    expect((error as ApiError).message).toBe('El servidor respondio 409');
+  });
+
+  it('deja code en undefined si el cuerpo de error no es JSON', async () => {
+    stubFetch(new Response('Bad Gateway', { status: 502 }));
+
+    const error = await api.get<void>('/health').catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect((error as ApiError).status).toBe(502);
+    expect((error as ApiError).code).toBeUndefined();
+  });
 });

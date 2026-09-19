@@ -58,7 +58,7 @@ function mutationErrorMessage(error: unknown): string {
 
 export interface AuthoritiesPanelProps {
   electionId: string;
-  electionEstado: 'BORRADOR' | 'REGISTRO_ABIERTO' | 'VOTACION_ABIERTA' | 'CERRADA';
+  electionEstado: 'BORRADOR' | 'REGISTRO_ABIERTO' | 'REGISTRO_CERRADO' | 'VOTACION_ABIERTA' | 'CERRADA';
 }
 
 export function AuthoritiesPanel({ electionId, electionEstado }: AuthoritiesPanelProps) {

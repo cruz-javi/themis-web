@@ -23,3 +23,12 @@ export function requireAuditor(auth: AuthContextValue): void {
 export function requireAutoridadRegistro(auth: AuthContextValue): void {
   requireRole(auth, ['AUTORIDAD_REGISTRO']);
 }
+
+/**
+ * Lotes de checkpoint (CU-07/08): los ve el ADMIN (solo lectura) y la
+ * AUTORIDAD_REGISTRO (que ademas aprueba). El AUDITOR tambien puede en el
+ * backend, pero hoy no tiene forma de listar elecciones (/elections es ADMIN).
+ */
+export function requireBatchViewer(auth: AuthContextValue): void {
+  requireRole(auth, ['ADMIN', 'AUTORIDAD_REGISTRO']);
+}

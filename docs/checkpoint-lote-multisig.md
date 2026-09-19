@@ -1,77 +1,63 @@
-# Checkpoint — inserción por lote con multisig (CU-06 a CU-09)
+# Checkpoint — aprobación de lotes con multisig (CU-08, pantalla)
 
-> Backend implementado en `themis-core` (detalle completo:
-> `themis-core/docs/checkpoint-lote-multisig.md`). **En `themis-web` todavía no se escribió código
-> para esto** — este documento describe el contrato de API ya disponible y el trabajo de UI
-> pendiente (CU-08, la única parte de este bloque marcada como "Web" en el diseño).
->
-> **Por qué esto bloquea probar el diagrama completo desde una UI**: sin esta pantalla, ninguna
-> autoridad tiene forma de aprobar un lote desde el navegador — solo hablando con la API a mano
-> (`curl`/Swagger). Es, junto con el registro (CU-05, exclusivo de `themis-app`, fuera de este
-> repo), una de las dos piezas que faltan para ver el ciclo completo de FASE 1 sin usar la API
-> directamente. Implementar esta pantalla es el paso que **más directamente** desbloquea eso, ya que
-> no depende de `themis-app` ni de que exista la integración on-chain real.
+> Estado: **implementado** en `src/features/batch-approval/`. El backend está en `themis-core`
+> (detalle: `themis-core/docs/checkpoint-lote-multisig.md`). Esta es la única parte del bloque CU-06 a
+> CU-09 marcada como "Web" en el diseño: la pantalla donde las autoridades revisan y aprueban los lotes.
 
-## Qué ya existe en el backend (consumible desde ahora)
+## Qué hace
 
-`themis-core` expone, detrás de la cookie de sesión (`credentials: 'include'`, igual que el resto de
-`src/api/`):
+- **`AUTORIDAD_REGISTRO`**: menú lateral "Mis elecciones" → lista de sus elecciones → lotes de la
+  elección → detalle del lote → **Aprobar lote** (con diálogo de confirmación).
+- **`ADMIN`**: desde el detalle de una elección, botón "Ver lotes". Ve la lista y el detalle en solo
+  lectura (sin botón de aprobar).
+- **`AUDITOR`**: el backend le permite leer lotes, pero hoy no tiene forma de listar elecciones
+  (`GET /elections` es solo ADMIN), así que no tiene pantalla.
 
-| Método | Ruta | Rol requerido | Para qué |
-|---|---|---|---|
-| `GET` | `/elections/mine/authority` | `AUTORIDAD_REGISTRO` | Descubrir en qué elecciones está designada la cuenta logueada (necesario antes de poder listar lotes — `GET /elections/:id/authorities` es ADMIN-only) |
-| `GET` | `/elections/:electionId/batches` | `ADMIN`, `AUTORIDAD_REGISTRO`, `AUDITOR` | Lista de lotes de una elección, con `yaAprobado` calculado para la cuenta logueada |
-| `GET` | `/elections/:electionId/batches/:batchId` | `ADMIN`, `AUTORIDAD_REGISTRO`, `AUDITOR` | Detalle: tamaño del lote, estado, aprobaciones (por `rolDescriptivo`, nunca identidad real), root/tx si ya insertó |
-| `POST` | `/elections/:electionId/batches/:batchId/approvals` | `AUTORIDAD_REGISTRO` | Aprueba el lote. La respuesta ya trae el estado actualizado (incluido `INSERTED` si esta aprobación fue la 3ra) |
-| `GET` | `/elections/:electionId/rate-alerts` | `ADMIN`, `AUDITOR` | Alertas de ritmo (CU-06) — sin UI planeada todavía, ver abajo |
+## Rutas (`src/routes/_authenticated/`)
 
-`RegistrationBatch.status`: `PENDING_APPROVAL | APPROVED | INSERTED | INSERTION_FAILED`. En
-`INSERTION_FAILED` la aprobación de la autoridad sí quedó registrada — lo que falló es el paso
-on-chain, y un cron de reintento lo reintenta solo; la UI no necesita ofrecer un botón de reintento
-manual.
+| Ruta | Guarda | Pantalla |
+|---|---|---|
+| `/authority/elections` | `requireAutoridadRegistro` | `MyElectionsPage` |
+| `/elections/$electionId/batches` | `requireBatchViewer` (ADMIN + AUTORIDAD_REGISTRO) | `BatchesPage` |
+| `/elections/$electionId/batches/$batchId` | `requireBatchViewer` | `BatchDetailPage` |
 
-**Importante**: la inserción on-chain real (Semaphore) todavía no está hecha del lado de
-`themis-core` — hoy usa un stub que simula el resultado. Los campos `merkleRootAfter`/`onChainTxHash`
-que devuelve la API son sintéticos por ahora, pero la forma del contrato ya es la definitiva.
+`requireBatchViewer` está en `features/auth/lib/role-guards.ts`.
 
-## Qué falta construir acá (`themis-web`)
+## Qué muestra el detalle de un lote
 
-Carpeta nueva `src/features/batch-approval/` (patrón `admin-roll/`: una lista, un detalle, una
-acción — más simple que `admin-elections/`):
+Tamaño del lote, fecha de cierre, estado (`BatchStatusBadge`), progreso "X de N aprobaciones" (N sale
+de `approvalsRequired`, no está fijo en 3) y la lista de `rolDescriptivo` de quienes ya aprobaron
+(**nunca** identidad real ni commitments). El botón Aprobar solo aparece para `AUTORIDAD_REGISTRO` y
+está deshabilitado si ya aprobó o el lote no está en `PENDING_APPROVAL`.
 
-```
-types/batch.types.ts
-hooks/use-my-authority-elections.ts   (GET /elections/mine/authority)
-hooks/use-batches.ts                  (GET /elections/:id/batches)
-hooks/use-batch-detail.ts             (GET /elections/:id/batches/:batchId)
-hooks/use-approve-batch.ts            (POST .../approvals, invalida detail + list)
-pages/PendingBatchesPage.tsx
-pages/BatchDetailPage.tsx
-```
+| Estado | Qué se ve |
+|---|---|
+| `PENDING_APPROVAL` | Progreso y botón Aprobar |
+| `APPROVED` | "Se alcanzó el número de aprobaciones, insertando en la cadena" |
+| `INSERTED` | Hash de la transacción y raíz del árbol, de solo lectura |
+| `INSERTION_FAILED` | "La aprobación quedó registrada, el sistema reintentará", sin botón de reintento y **sin** mostrar `failureReason` (es un error técnico largo) |
 
-Rutas TanStack Router nuevas, mismo patrón que `_authenticated/admin/elections/`:
+Las pantallas de lista y detalle se refrescan solas cada 15 s (otras autoridades aprueban en
+paralelo); el detalle deja de refrescarse al llegar a `INSERTED`.
 
-```
-src/routes/_authenticated/authority/elections/$electionId/batches/index.tsx
-src/routes/_authenticated/authority/elections/$electionId/batches/$batchId.tsx
-```
+## Errores
 
-`beforeLoad` usa `requireAutoridadRegistro` — **ya existe** en `src/features/auth/lib/role-guards.ts`,
-se reutiliza tal cual, sin tocarlo.
+`ApiError` (`src/api/client.ts`) ahora trae `code`, el código de dominio del cuerpo `{code, message}` de
+themis-core. `lib/approve-error-message.ts` lo traduce: `BATCH_ALREADY_APPROVED_BY_AUTHORITY`,
+`BATCH_NOT_PENDING_APPROVAL`, `AUTHORITY_NOT_DESIGNATED_FOR_ELECTION`, `BATCH_NOT_FOUND`. `message` sigue
+siendo el genérico de siempre.
 
-`BatchDetailPage`: tamaño del lote, fecha de cierre, badge de estado (reusar `StatusBadge` de
-`src/components/ui/`), progreso "X de 3" listando `rolDescriptivo` de cada aprobación (nunca
-identidad real ni commitments), botón Aprobar deshabilitado si `yaAprobado` o si
-`status !== 'PENDING_APPROVAL'`. En `INSERTED` mostrar `onChainTxHash`/`merkleRootAfter` de solo
-lectura. En `INSERTION_FAILED` un mensaje simple ("tu aprobación quedó registrada, el sistema
-reintentará") sin botón de reintento.
+## Notas de implementación
 
-**Fuera de alcance de esta pasada**: pantalla para `GET /elections/:id/rate-alerts` (CU-06) — el
-endpoint ya existe, pero no hay pantalla planeada todavía; candidato natural para una futura pestaña
-"Alertas" en `ElectionDetailPage`.
+- El estado del lote usa `Badge`, no `StatusBadge` (ese solo muestra "conectado/sin conexión").
+- Las autoridades no pueden pedir `GET /elections/:id` (es ADMIN-only); por eso la lista sale de
+  `GET /elections/mine/authority` y las pantallas de lotes no muestran el nombre de la elección.
+- No se agregó `dialog.tsx`: la confirmación usa `AlertDialog`, que ya existía.
+- Fuera de alcance: pantalla de alertas de ritmo (CU-06, el endpoint `GET /elections/:id/rate-alerts`
+  existe; candidato natural a una pestaña "Alertas" en `ElectionDetailPage`).
 
-## Ver también
+## Tests
 
-- `themis-core/docs/checkpoint-lote-multisig.md` — detalle completo del backend (modelo de datos,
-  casos de uso, cron, tests, qué falta del lado de `themis-core`).
-- `docs/docs/modelo-bd-registro.md` (a nivel workspace) — diseño de datos de referencia.
+`use-approve-batch.test.tsx` (invalida detalle y lista), `BatchDetailPage.test.tsx` (botón por rol y por
+estado, mensajes por `code`, no expone el error crudo), `role-guards.test.ts`, y `api/client.test.ts`
+(expone `code`).

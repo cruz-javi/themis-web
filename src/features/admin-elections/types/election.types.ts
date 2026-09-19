@@ -5,6 +5,7 @@
 export type ElectionStatus =
   | 'BORRADOR'
   | 'REGISTRO_ABIERTO'
+  | 'REGISTRO_CERRADO'
   | 'VOTACION_ABIERTA'
   | 'CERRADA';
 

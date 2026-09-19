@@ -6,6 +6,8 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public readonly status: number,
+    /** `code` del cuerpo de error de themis-core ({code, message}), si vino. */
+    public readonly code?: string,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -26,9 +28,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
+    // themis-core responde los errores de dominio como {code, message}; se conserva solo
+    // `code` (para distinguir p. ej. dos 409 distintos) y `message` sigue siendo el de siempre.
+    const body = (await response.json().catch(() => null)) as { code?: unknown } | null;
+    const code = typeof body?.code === 'string' ? body.code : undefined;
     throw new ApiError(
       `El servidor respondio ${response.status}`,
       response.status,
+      code,
     );
   }
 

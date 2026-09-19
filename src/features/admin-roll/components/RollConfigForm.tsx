@@ -37,7 +37,7 @@ function mutationErrorMessage(error: unknown): string {
 
 export interface RollConfigFormProps {
   electionId: string;
-  electionEstado: 'BORRADOR' | 'REGISTRO_ABIERTO' | 'VOTACION_ABIERTA' | 'CERRADA';
+  electionEstado: 'BORRADOR' | 'REGISTRO_ABIERTO' | 'REGISTRO_CERRADO' | 'VOTACION_ABIERTA' | 'CERRADA';
 }
 
 export function RollConfigForm({ electionId, electionEstado }: RollConfigFormProps) {

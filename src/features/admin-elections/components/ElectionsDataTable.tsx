@@ -2,9 +2,10 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/data-table/DataTable';
 import type { ElectionDto } from '../types/election.types';
 
-const ESTADO_LABELS: Record<ElectionDto['estado'], string> = {
+export const ESTADO_LABELS: Record<ElectionDto['estado'], string> = {
   BORRADOR: 'Borrador',
   REGISTRO_ABIERTO: 'Registro abierto',
+  REGISTRO_CERRADO: 'Registro cerrado',
   VOTACION_ABIERTA: 'Votación abierta',
   CERRADA: 'Cerrada',
 };

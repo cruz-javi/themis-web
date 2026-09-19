@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useElection } from '../hooks/use-election';
 import { ElectionFormDrawer } from '../components/ElectionFormDrawer';
 import { AuthoritiesPanel } from '../components/AuthoritiesPanel';
@@ -27,6 +28,7 @@ export interface ElectionDetailPageProps {
  * lo documentado en docs/UT/HU02..04/UT-WEB (ver decisión de implementación).
  */
 export function ElectionDetailPage({ electionId }: ElectionDetailPageProps) {
+  const navigate = useNavigate();
   const electionQuery = useElection(electionId);
   const [tab, setTab] = React.useState<TabId>('datos');
   const [editOpen, setEditOpen] = React.useState(false);
@@ -47,9 +49,20 @@ export function ElectionDetailPage({ electionId }: ElectionDetailPageProps) {
             {election.umbralFirmas}
           </p>
         </div>
-        <Button type="button" variant="outline" onClick={() => setEditOpen(true)}>
-          Editar datos maestros
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() =>
+              navigate({ to: '/elections/$electionId/batches', params: { electionId } })
+            }
+          >
+            Ver lotes
+          </Button>
+          <Button type="button" variant="outline" onClick={() => setEditOpen(true)}>
+            Editar datos maestros
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-1 border-b">

@@ -24,6 +24,7 @@ const PAGE_SIZE = 10;
 const ESTADO_OPTIONS: { value: ElectionStatus; label: string }[] = [
   { value: 'BORRADOR', label: 'Borrador' },
   { value: 'REGISTRO_ABIERTO', label: 'Registro abierto' },
+  { value: 'REGISTRO_CERRADO', label: 'Registro cerrado' },
   { value: 'VOTACION_ABIERTA', label: 'Votación abierta' },
   { value: 'CERRADA', label: 'Cerrada' },
 ];
