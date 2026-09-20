@@ -11,14 +11,14 @@ export function AuditElectionsListPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Auditoría</h1>
+        <h1 className="page-title">Auditoría</h1>
         <p className="text-sm text-muted-foreground">
           Elegí una elección para ver su historial de registro y resultado.
         </p>
       </div>
 
       {electionsQuery.isError ? (
-        <p className="text-sm text-red-700" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           No se pudieron cargar las elecciones.
         </p>
       ) : null}
@@ -31,7 +31,7 @@ export function AuditElectionsListPage() {
             params={{ electionId: election.id }}
             className="block"
           >
-            <Card className="transition-colors hover:bg-accent">
+            <Card className="border-l-4 border-l-brand transition-all hover:-translate-y-0.5 hover:border-brand/60 hover:shadow-md">
               <CardHeader>
                 <CardTitle>{election.nombre}</CardTitle>
                 <CardDescription>{election.estado}</CardDescription>

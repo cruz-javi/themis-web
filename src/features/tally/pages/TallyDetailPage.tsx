@@ -18,14 +18,14 @@ export function TallyDetailPage({ electionId }: TallyDetailPageProps) {
   return (
     <div className="mx-auto max-w-2xl space-y-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold">Conteo en vivo</h1>
+        <h1 className="page-title">Conteo en vivo</h1>
         <p className="text-sm text-muted-foreground">
           Se actualiza automáticamente cada pocos segundos.
         </p>
       </div>
 
       {tallyQuery.isError ? (
-        <p className="text-sm text-red-700" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           No se pudo cargar el conteo.
         </p>
       ) : null}

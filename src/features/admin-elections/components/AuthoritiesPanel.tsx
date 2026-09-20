@@ -204,10 +204,10 @@ function DesignateAuthoritiesForm({
       ))}
 
       {form.formState.errors.autoridades?.message ? (
-        <p className="text-sm text-red-700">{form.formState.errors.autoridades.message}</p>
+        <p className="text-sm text-destructive">{form.formState.errors.autoridades.message}</p>
       ) : null}
       {designateAuthorities.isError ? (
-        <p className="text-sm text-red-700" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {mutationErrorMessage(designateAuthorities.error)}
         </p>
       ) : null}
@@ -308,7 +308,7 @@ function ReplaceAuthorityDrawer({
               </div>
 
               {replaceAuthority.isError ? (
-                <p className="text-sm text-red-700" role="alert">
+                <p className="text-sm text-destructive" role="alert">
                   {mutationErrorMessage(replaceAuthority.error)}
                 </p>
               ) : null}

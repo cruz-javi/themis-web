@@ -124,7 +124,7 @@ function CreateUserForm({ onDone }: { onDone: () => void }) {
             {...form.register('nombreCompleto')}
           />
           {form.formState.errors.nombreCompleto ? (
-            <p className="text-sm text-red-700">
+            <p className="text-sm text-destructive">
               {form.formState.errors.nombreCompleto.message}
             </p>
           ) : null}
@@ -141,7 +141,7 @@ function CreateUserForm({ onDone }: { onDone: () => void }) {
             {...form.register('email')}
           />
           {form.formState.errors.email ? (
-            <p className="text-sm text-red-700">{form.formState.errors.email.message}</p>
+            <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
           ) : null}
         </div>
 
@@ -155,7 +155,7 @@ function CreateUserForm({ onDone }: { onDone: () => void }) {
             {...form.register('password')}
           />
           {form.formState.errors.password ? (
-            <p className="text-sm text-red-700">{form.formState.errors.password.message}</p>
+            <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
           ) : null}
         </div>
 
@@ -167,12 +167,12 @@ function CreateUserForm({ onDone }: { onDone: () => void }) {
             {...form.register('role')}
           />
           {form.formState.errors.role ? (
-            <p className="text-sm text-red-700">{form.formState.errors.role.message}</p>
+            <p className="text-sm text-destructive">{form.formState.errors.role.message}</p>
           ) : null}
         </div>
 
         {createUser.isError ? (
-          <p className="text-sm text-red-700" role="alert">
+          <p className="text-sm text-destructive" role="alert">
             {mutationErrorMessage(createUser.error)}
           </p>
         ) : null}
@@ -222,7 +222,7 @@ function EditUserForm({ user, onDone }: { user: PlatformUserDto; onDone: () => v
             {...form.register('nombreCompleto')}
           />
           {form.formState.errors.nombreCompleto ? (
-            <p className="text-sm text-red-700">
+            <p className="text-sm text-destructive">
               {form.formState.errors.nombreCompleto.message}
             </p>
           ) : null}
@@ -236,12 +236,12 @@ function EditUserForm({ user, onDone }: { user: PlatformUserDto; onDone: () => v
             {...form.register('role')}
           />
           {form.formState.errors.role ? (
-            <p className="text-sm text-red-700">{form.formState.errors.role.message}</p>
+            <p className="text-sm text-destructive">{form.formState.errors.role.message}</p>
           ) : null}
         </div>
 
         {updateUser.isError ? (
-          <p className="text-sm text-red-700" role="alert">
+          <p className="text-sm text-destructive" role="alert">
             {mutationErrorMessage(updateUser.error)}
           </p>
         ) : null}

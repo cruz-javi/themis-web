@@ -10,7 +10,7 @@ export function TallyElectionsListPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold">Conteo de votos en vivo</h1>
+        <h1 className="page-title">Conteo de votos en vivo</h1>
         <p className="text-sm text-muted-foreground">
           Elegí una elección para ver su conteo en tiempo real.
         </p>
@@ -21,7 +21,7 @@ export function TallyElectionsListPage() {
       ) : null}
 
       {electionsQuery.isError ? (
-        <p className="text-sm text-red-700" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           No se pudieron cargar las elecciones.
         </p>
       ) : null}
@@ -38,7 +38,7 @@ export function TallyElectionsListPage() {
             params={{ electionId: election.id }}
             className="block"
           >
-            <Card className="transition-colors hover:bg-accent">
+            <Card className="border-l-4 border-l-brand transition-all hover:-translate-y-0.5 hover:border-brand/60 hover:shadow-md">
               <CardHeader>
                 <CardTitle>{election.nombre}</CardTitle>
                 <CardDescription>{election.estado}</CardDescription>
