@@ -2,7 +2,7 @@
 
 Portal administrativo y anfitrión del código de generación de pruebas ZK. Contexto de producto completo en [`../docs/diseno-consolidado.md`](../docs/diseno-consolidado.md).
 
-**No es una vía de voto público.** El único votante que toca este código lo hace indirectamente: `themis-app` abre esta app dentro de un WebView interno contra una ruta `/prove` (todavía no implementada) para reusar el snarkjs/Circom en JS, y recibe la prueba de vuelta por `postMessage`. Nadie que entre desde un navegador normal puede votar — esta app es para Admin/Autoridad/Auditor/público (resultados en vivo), más esa ruta interna consumida por la app móvil.
+**No es una vía de voto público.** El único votante que toca este código lo hace indirectamente: `themis-app` abre esta app dentro de un WebView interno contra la ruta `/prove` (`src/features/prove/`, implementada — snarkjs real vía `@semaphore-protocol/proof`, artefactos del circuito descargados del CDN oficial `snark-artifacts.pse.dev`) para reusar el snarkjs/Circom en JS, y recibe la prueba de vuelta por `postMessage` (`window.ThemisVoteChannel`). Nadie que entre desde un navegador normal puede votar — la página se niega a operar sin ese channel. Esta app es para Admin/Autoridad/Auditor/público (resultados en vivo, `/tally`), más esa ruta interna consumida por la app móvil.
 
 ## Stack
 
@@ -37,9 +37,9 @@ src/api/generated/     Cliente generado desde el OpenAPI de themis-core (si exis
 
 El login de Admin/Autoridad/Auditor (`src/routes/login.tsx`, `src/features/auth/`) habla con `POST /api/v1/auth/login` de themis-core, que **responde con una cookie httpOnly** (`access_token`), no con un token en el body. El cliente HTTP debe mandar `credentials: 'include'` (o equivalente) en cada request — no hay token que guardar manualmente en `localStorage`. Ver `themis-core/src/modules/auth/README.md` para el contrato completo y las credenciales de prueba sembradas (`admin@themis.dev` / `123123`, etc.).
 
-## Ruta `/prove` — pendiente
+## Ruta `/prove` — implementada
 
-El documento de diseño asume una ruta `/prove` que genera la prueba ZK y se comunica con el WebView anfitrión vía `postMessage`. Todavía no existe en `src/routes/`. Cuando se implemente: debe ser accesible sin depender de la sesión de cookie de Admin (el votante que la carga desde el WebView de la app no tiene esa cookie), y no debe quedar indexada/linkeada como una vía de voto navegable desde el resto del portal.
+`src/routes/prove.tsx` + `src/features/prove/pages/ProvePage.tsx`. Pública (fuera de `_authenticated/`, sin cookie), no linkeada desde `nav-items.ts` (mismo precedente que `/demo`). Expone `window.generateVoteProof(json)`, hace `fetch` directo a `voting-context` de themis-core (el `apiBaseUrl` viaja en el payload que manda la app, no se asume un host fijo), arma el `Group` de Semaphore y genera la prueba con `@semaphore-protocol/proof`. Si se abre en un navegador normal (sin `window.ThemisVoteChannel`), no hace nada — solo muestra un aviso.
 
 ## CORS para desarrollo con Flutter Web/Chrome
 
