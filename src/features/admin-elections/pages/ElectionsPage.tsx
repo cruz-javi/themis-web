@@ -71,7 +71,7 @@ export function ElectionsPage() {
         <div>
           <h1 className="page-title">Elecciones</h1>
           <p className="text-sm text-muted-foreground">
-            Crear, configurar y administrar elecciones (HU-01).
+            Crear, configurar y administrar elecciones.
           </p>
         </div>
         <Button type="button" onClick={() => setDrawer({ mode: 'create' })}>
