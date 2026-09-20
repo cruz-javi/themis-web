@@ -20,7 +20,7 @@ function RouterWithAuth() {
   if (auth.status === 'pending') {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-sm text-slate-500" role="status">
+        <p className="text-sm text-muted-foreground" role="status">
           Cargando...
         </p>
       </div>

@@ -186,7 +186,7 @@ function ElectionForm({
             {...form.register('nombre')}
           />
           {form.formState.errors.nombre ? (
-            <p className="text-sm text-red-700">{form.formState.errors.nombre.message}</p>
+            <p className="text-sm text-destructive">{form.formState.errors.nombre.message}</p>
           ) : null}
         </div>
 
@@ -232,7 +232,7 @@ function ElectionForm({
               )}
             />
             {form.formState.errors.registroFin ? (
-              <p className="text-sm text-red-700">
+              <p className="text-sm text-destructive">
                 {form.formState.errors.registroFin.message}
               </p>
             ) : null}
@@ -255,7 +255,7 @@ function ElectionForm({
               )}
             />
             {form.formState.errors.votacionInicio ? (
-              <p className="text-sm text-red-700">
+              <p className="text-sm text-destructive">
                 {form.formState.errors.votacionInicio.message}
               </p>
             ) : null}
@@ -278,7 +278,7 @@ function ElectionForm({
               )}
             />
             {form.formState.errors.votacionFin ? (
-              <p className="text-sm text-red-700">
+              <p className="text-sm text-destructive">
                 {form.formState.errors.votacionFin.message}
               </p>
             ) : null}
@@ -322,7 +322,7 @@ function ElectionForm({
             </div>
           ))}
           {form.formState.errors.opciones?.message ? (
-            <p className="text-sm text-red-700">{form.formState.errors.opciones.message}</p>
+            <p className="text-sm text-destructive">{form.formState.errors.opciones.message}</p>
           ) : null}
         </div>
 
@@ -334,7 +334,7 @@ function ElectionForm({
         ) : null}
 
         {mutation.isError ? (
-          <p className="text-sm text-red-700" role="alert">
+          <p className="text-sm text-destructive" role="alert">
             {mutationErrorMessage(mutation.error)}
           </p>
         ) : null}

@@ -3,13 +3,12 @@ import { useNavigate } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useFitPageSize } from '@/hooks/use-fit-page-size';
 import { DataTable } from '@/components/data-table/DataTable';
 import { useSession } from '@/features/auth/hooks/use-session';
 import { useBatches } from '../hooks/use-batches';
 import { BatchStatusBadge } from '../components/BatchStatusBadge';
 import type { BatchDto } from '../types/batch.types';
-
-const PAGE_SIZE = 10;
 
 export interface BatchesPageProps {
   electionId: string;
@@ -20,14 +19,21 @@ export function BatchesPage({ electionId }: BatchesPageProps) {
   const { session } = useSession();
   const isAuthority = session?.role === 'AUTORIDAD_REGISTRO';
   const [pageIndex, setPageIndex] = React.useState(0);
+  const { ref: tableRef, pageSize } = useFitPageSize();
   const batchesQuery = useBatches(electionId);
 
   // Mas recientes primero.
   const all = [...(batchesQuery.data ?? [])].sort(
     (a, b) => new Date(b.closedAt).getTime() - new Date(a.closedAt).getTime(),
   );
-  const data = all.slice(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE);
-  const pageCount = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+  const data = all.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+  const pageCount = Math.max(1, Math.ceil(all.length / pageSize));
+
+  React.useEffect(() => {
+    if (pageIndex > pageCount - 1) {
+      setPageIndex(pageCount - 1);
+    }
+  }, [pageIndex, pageCount]);
 
   const columns: ColumnDef<BatchDto>[] = [
     {
@@ -70,10 +76,10 @@ export function BatchesPage({ electionId }: BatchesPageProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex h-full min-h-0 flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Lotes de checkpoint</h1>
+          <h1 className="page-title">Lotes de checkpoint</h1>
           <p className="text-sm text-muted-foreground">
             Cada checkpoint agrupa las credenciales presentadas. Con las aprobaciones necesarias,
             el lote se inserta en el árbol on-chain.
@@ -86,16 +92,17 @@ export function BatchesPage({ electionId }: BatchesPageProps) {
       </div>
 
       {batchesQuery.isError ? (
-        <p className="text-sm text-red-700" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           No se pudieron cargar los lotes.
         </p>
       ) : null}
 
+      <div ref={tableRef} className="min-h-0 flex-1">
       <DataTable
         columns={columns}
         data={data}
         pageIndex={pageIndex}
-        pageSize={PAGE_SIZE}
+        pageSize={pageSize}
         pageCount={pageCount}
         onPageChange={setPageIndex}
         isLoading={batchesQuery.isLoading}
@@ -108,6 +115,7 @@ export function BatchesPage({ electionId }: BatchesPageProps) {
         }}
         emptyMessage="Todavía no hay lotes: se crean al cerrar cada checkpoint si hay credenciales pendientes."
       />
+      </div>
     </div>
   );
 }

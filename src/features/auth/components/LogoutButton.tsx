@@ -22,7 +22,7 @@ export function LogoutButton() {
 
   return (
     <div className="flex items-center gap-3">
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-muted-foreground">
         Conectado como <span className="font-medium">{session.nombreCompleto}</span> (
         {session.role})
       </p>
