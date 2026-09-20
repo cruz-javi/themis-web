@@ -23,7 +23,7 @@ export function AuditElectionDetailPage({ electionId }: AuditElectionDetailPageP
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Auditoría de elección</h1>
+        <h1 className="page-title">Auditoría de elección</h1>
         {audit ? <Badge variant="secondary">{audit.estado}</Badge> : null}
       </div>
 

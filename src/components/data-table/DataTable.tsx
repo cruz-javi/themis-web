@@ -63,8 +63,8 @@ export function DataTable<TData>({
   const canGoNext = pageIndex + 1 < pageCount;
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-md border">
+    <div className="flex max-h-full flex-col gap-4">
+      <div className="min-h-0 overflow-auto rounded-xl border bg-card shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-12px_rgba(15,23,42,0.10)]">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -114,7 +114,7 @@ export function DataTable<TData>({
         </Table>
       </div>
 
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex shrink-0 items-center justify-end gap-2">
         <span className="text-sm text-muted-foreground">
           Página {pageIndex + 1} de {Math.max(pageCount, 1)}
         </span>
