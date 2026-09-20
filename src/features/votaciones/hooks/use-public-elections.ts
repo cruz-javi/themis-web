@@ -15,3 +15,11 @@ export function usePublicElections(estado?: PublicElectionStatus) {
       ),
   });
 }
+
+export function usePublicElection(electionId: string) {
+  return useQuery({
+    queryKey: ['elections', 'public', electionId] as const,
+    queryFn: () => api.get<PublicElectionDto>(`/elections/public/${electionId}`),
+    enabled: electionId.length > 0,
+  });
+}

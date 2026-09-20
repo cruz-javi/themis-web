@@ -39,6 +39,17 @@
   --sidebar-accent-foreground: #f8fafc;
   --sidebar-border: #1e293b;
   --sidebar-ring: #12b39b;
+  /* Paleta categorica para graficos (dashboard de resultados, CU-11):
+     distinta del teal de marca a proposito, para no confundir "en vivo/marca"
+     con "candidato" cuando se listan varias opciones. */
+  --chart-1: #2f4c81;
+  --chart-1-soft: #e8edf6;
+  --chart-2: #a9762f;
+  --chart-2-soft: #f6eedc;
+  --chart-3: #7d3552;
+  --chart-3-soft: #f3e7eb;
+  --chart-4: #64748b;
+  --chart-4-soft: #eef1f5;
 }
 
 .dark {
@@ -115,6 +126,14 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  --color-chart-1: var(--chart-1);
+  --color-chart-1-soft: var(--chart-1-soft);
+  --color-chart-2: var(--chart-2);
+  --color-chart-2-soft: var(--chart-2-soft);
+  --color-chart-3: var(--chart-3);
+  --color-chart-3-soft: var(--chart-3-soft);
+  --color-chart-4: var(--chart-4);
+  --color-chart-4-soft: var(--chart-4-soft);
 }
 
 @layer base {

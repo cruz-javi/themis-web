@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { usePublicElections } from '@/features/tally/hooks/use-public-elections';
+import { usePublicElections } from '@/features/votaciones/hooks/use-public-elections';
 
 // CU-15: listado de elecciones para el Auditor. Reusa el mismo endpoint
 // publico que CU-11 (GET /elections/public) -- antes de esto el Auditor no
