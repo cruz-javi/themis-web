@@ -36,7 +36,12 @@ function ProvePage() {
       setStatus('generating');
       setErrorMessage(null);
       try {
-        const identity = new Identity(privateKey);
+        let identity: Identity;
+        try {
+          identity = Identity.import(privateKey);
+        } catch {
+          identity = new Identity(privateKey);
+        }
         const group = new Group(members);
         const proof = await generateProof(identity, group, message, scope);
 
