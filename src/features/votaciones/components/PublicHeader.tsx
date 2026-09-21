@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AiForecastModal } from '@/features/ai-forecast/components/AiForecastModal';
 
 // Header de las paginas publicas de CU-11 (landing "/", "/votaciones" y su
 // detalle) -- sin sesion, con acceso a /login para Admin/Autoridad/Auditor.
@@ -13,9 +14,13 @@ export function PublicHeader() {
         </span>
         <span className="text-[19px] font-bold tracking-tight text-foreground">Themis</span>
       </Link>
-      <Button asChild variant="outline" className="rounded-full">
-        <Link to="/login">Iniciar sesión</Link>
-      </Button>
+      
+      <div className="flex items-center gap-3">
+        <AiForecastModal />
+        <Button asChild variant="outline" className="rounded-full">
+          <Link to="/login">Iniciar sesión</Link>
+        </Button>
+      </div>
     </header>
   );
 }
