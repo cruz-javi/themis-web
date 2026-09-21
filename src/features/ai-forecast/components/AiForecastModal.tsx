@@ -26,27 +26,26 @@ interface ForecastPoint {
 interface ForecastResponse {
   electionId: string;
   model: string;
+  history: ForecastPoint[];
   projection: ForecastPoint[];
   congestionProjection: ForecastPoint[];
   dropoffProjection: ForecastPoint[];
   projectedTotal: number;
+  cap: number;
+  winnerProjection: {
+    optionId: string;
+    nombre: string;
+    currentVotes: number;
+    projectedVotes: number;
+    winProbability: number;
+  }[];
 }
-
-const MOCK_SERIES = [
-  { t: 1, votes: 50 },
-  { t: 2, votes: 120 },
-  { t: 3, votes: 350 },
-  { t: 4, votes: 600 }
-];
 
 export function AiForecastModal() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [forecast, setForecast] = useState<ForecastResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
-  // Nuevo estado para la capacidad dinámica (Padrón Total)
-  const [cap, setCap] = useState<number>(5000);
 
   useEffect(() => {
     if (open && !forecast) {
@@ -65,11 +64,8 @@ export function AiForecastModal() {
           'x-service-token': 'cambiar-por-el-mismo-valor-que-AI_SERVICE_TOKEN-en-themis-core',
         },
         body: JSON.stringify({
-          electionId: "demo-ai",
+          electionId: "auto",
           horizon: 10,
-          series: MOCK_SERIES,
-          startTime: "2026-09-20T08:00:00Z",
-          cap: cap // Enviamos el padrón dinámicamente a Python
         }),
       });
 
@@ -87,15 +83,19 @@ export function AiForecastModal() {
   };
 
   // DATOS GRÁFICA 1: EMPADRONAMIENTO
-  const historyData = MOCK_SERIES.map(p => ({ time: p.t, real: p.votes, predicted: null }));
-  const lastReal = MOCK_SERIES[MOCK_SERIES.length - 1];
+  const historyData = (forecast?.history || []).map(p => ({ time: p.t, real: p.votes, predicted: null }));
+  const lastReal = historyData.length > 0 ? historyData[historyData.length - 1] : { time: 0, real: null };
   const projectionData = (forecast?.projection || []).map(p => ({ time: p.t, real: null, predicted: p.votes }));
   
   const chartData: { time: number; real: number | null; predicted: number | null }[] = [...historyData];
-  if (forecast) {
-    chartData.push({ time: lastReal.t, real: null, predicted: lastReal.votes });
+  if (forecast && historyData.length > 0) {
+    chartData.push({ time: lastReal.time, real: null, predicted: lastReal.real });
+    chartData.push(...projectionData);
+  } else if (forecast) {
     chartData.push(...projectionData);
   }
+  
+  const currentCap = forecast?.cap || 100;
 
   // DATOS GRÁFICA 2: CONGESTIÓN
   const congestionData = (forecast?.congestionProjection || []).map(p => ({ time: p.t, congestion: p.votes }));
@@ -137,13 +137,9 @@ export function AiForecastModal() {
                 </Dialog.Description>
               </div>
               <div className="flex items-center gap-3 bg-muted/30 p-2 rounded-lg border border-border">
-                <label className="text-xs font-bold text-muted-foreground uppercase whitespace-nowrap">Padrón Total:</label>
-                <input 
-                  type="number" 
-                  value={cap} 
-                  onChange={(e) => setCap(Number(e.target.value))}
-                  className="w-24 text-sm font-semibold p-1 rounded border border-border bg-background focus:ring-1 focus:ring-brand outline-none"
-                />
+                <div className="text-xs font-bold text-muted-foreground uppercase whitespace-nowrap">
+                  Padrón Calculado: <span className="text-brand text-sm">{forecast?.cap || 0}</span>
+                </div>
                 <Button size="sm" onClick={fetchForecast} disabled={loading} className="h-7 text-xs bg-brand hover:bg-brand/90 text-white">
                   Recalcular
                 </Button>
@@ -202,13 +198,50 @@ export function AiForecastModal() {
                   </Card>
                 </div>
 
+                {/* PROYECCIÓN DE GANADOR */}
+                {forecast.winnerProjection && forecast.winnerProjection.length > 0 && (
+                  <div className="space-y-3 pt-2">
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                      Módulo de Predicción de Ganador
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Proyección del vencedor basada en distribución inercial sobre votos faltantes.</p>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {forecast.winnerProjection.sort((a,b) => b.projectedVotes - a.projectedVotes).map((cand, idx) => (
+                        <Card key={cand.optionId} className={`p-4 flex items-center gap-4 transition-all ${idx === 0 ? 'bg-amber-50 border-amber-200 ring-1 ring-amber-300' : 'bg-card border-border opacity-80'}`}>
+                          <div className={`flex size-12 items-center justify-center rounded-full text-2xl font-bold shadow-sm ${idx === 0 ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-white' : 'bg-muted text-muted-foreground'}`}>
+                            {idx === 0 ? '👑' : idx + 1}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-extrabold text-foreground line-clamp-1">{cand.nombre}</p>
+                            <div className="flex justify-between items-end mt-1">
+                              <div>
+                                <p className="text-[10px] text-muted-foreground uppercase font-bold">Votos Proyectados</p>
+                                <p className={`text-xl font-black ${idx === 0 ? 'text-amber-700' : 'text-foreground'}`}>{cand.projectedVotes}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-[10px] text-muted-foreground uppercase font-bold">Probabilidad</p>
+                                <p className={`text-sm font-black ${idx === 0 ? 'text-amber-700' : 'text-foreground'}`}>{cand.winProbability.toFixed(1)}%</p>
+                              </div>
+                            </div>
+                            <div className="mt-2 h-1.5 w-full bg-black/5 rounded-full overflow-hidden">
+                              <div className={`h-full ${idx === 0 ? 'bg-amber-500' : 'bg-slate-400'}`} style={{ width: `${cand.winProbability}%` }}></div>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* GRAFICA 1: EMPADRONAMIENTO */}
                 <div className="space-y-3">
                   <h3 className="text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-brand"></span>
                     Curva 1: Predicción de Empadronamiento Final
                   </h3>
-                  <p className="text-xs text-muted-foreground">Proyección de crecimiento logístico (limitado por el padrón de {cap} estudiantes).</p>
+                  <p className="text-xs text-muted-foreground">Proyección de crecimiento logístico (limitado por el padrón de {currentCap} estudiantes).</p>
                   <div className="h-[250px] w-full border rounded-xl p-4 bg-card shadow-sm">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={chartData} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
@@ -220,11 +253,11 @@ export function AiForecastModal() {
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                         <XAxis dataKey="time" tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} tickFormatter={(val) => `t+${val}`} />
-                        <YAxis tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} domain={[0, cap]} />
+                        <YAxis tickLine={false} axisLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} domain={[0, currentCap]} />
                         <Tooltip contentStyle={{ borderRadius: '8px' }} labelFormatter={(l) => `Minuto: ${l}`} />
                         
                         {/* Linea de Quorum del 30% */}
-                        <ReferenceLine y={cap * 0.3} stroke="#ef4444" strokeDasharray="3 3" label={{ position: 'top', value: 'Quórum Mínimo (30%)', fill: '#ef4444', fontSize: 11, fontWeight: 'bold' }} />
+                        <ReferenceLine y={currentCap * 0.3} stroke="#ef4444" strokeDasharray="3 3" label={{ position: 'top', value: 'Quórum Mínimo (30%)', fill: '#ef4444', fontSize: 11, fontWeight: 'bold' }} />
                         <ReferenceLine x={4} stroke="hsl(var(--muted-foreground))" strokeDasharray="3 3" label={{ position: 'top', value: 'AHORA', fill: 'hsl(var(--muted-foreground))', fontSize: 10 }} />
 
                         <Area type="monotone" dataKey="predicted" name="Proyección IA" stroke="#059669" strokeWidth={3} strokeDasharray="5 5" fillOpacity={1} fill="url(#colorPredicted)" connectNulls />
