@@ -39,7 +39,7 @@ export function BatchDetailPage({ electionId, batchId }: BatchDetailPageProps) {
   if (detailQuery.isError) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-red-700" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           No se pudo cargar el lote.
         </p>
         <Button type="button" variant="outline" onClick={goBack}>
@@ -71,7 +71,7 @@ export function BatchDetailPage({ electionId, batchId }: BatchDetailPageProps) {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-slate-900">Lote de checkpoint</h1>
+          <h1 className="page-title">Lote de checkpoint</h1>
           <BatchStatusBadge status={batch.status} />
         </div>
         <Button type="button" variant="outline" onClick={goBack}>
@@ -171,7 +171,7 @@ export function BatchDetailPage({ electionId, batchId }: BatchDetailPageProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           {approve.isError ? (
-            <p className="text-sm text-red-700" role="alert">
+            <p className="text-sm text-destructive" role="alert">
               {approveErrorMessage(approve.error)}
             </p>
           ) : null}

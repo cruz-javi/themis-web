@@ -1,12 +1,11 @@
 import * as React from 'react';
+import { useFitPageSize } from '@/hooks/use-fit-page-size';
 import { useNavigate } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/components/data-table/DataTable';
 import { ESTADO_LABELS } from '@/features/admin-elections/components/ElectionsDataTable';
 import type { ElectionDto } from '@/features/admin-elections/types/election.types';
 import { useMyAuthorityElections } from '../hooks/use-my-authority-elections';
-
-const PAGE_SIZE = 10;
 
 function formatDate(value: string): string {
   return new Date(value).toLocaleDateString('es-BO', {
@@ -35,16 +34,23 @@ const columns: ColumnDef<ElectionDto>[] = [
 export function MyElectionsPage() {
   const navigate = useNavigate();
   const [pageIndex, setPageIndex] = React.useState(0);
+  const { ref: tableRef, pageSize } = useFitPageSize();
   const electionsQuery = useMyAuthorityElections();
 
   const all = electionsQuery.data ?? [];
-  const data = all.slice(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE);
-  const pageCount = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+  const data = all.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+  const pageCount = Math.max(1, Math.ceil(all.length / pageSize));
+
+  React.useEffect(() => {
+    if (pageIndex > pageCount - 1) {
+      setPageIndex(pageCount - 1);
+    }
+  }, [pageIndex, pageCount]);
 
   return (
-    <div className="space-y-6">
+    <div className="flex h-full min-h-0 flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Mis elecciones</h1>
+        <h1 className="page-title">Mis elecciones</h1>
         <p className="text-sm text-muted-foreground">
           Elecciones en las que estás designado como autoridad de registro. Entra a una para
           revisar y aprobar sus lotes.
@@ -52,16 +58,17 @@ export function MyElectionsPage() {
       </div>
 
       {electionsQuery.isError ? (
-        <p className="text-sm text-red-700" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           No se pudieron cargar tus elecciones.
         </p>
       ) : null}
 
+      <div ref={tableRef} className="min-h-0 flex-1">
       <DataTable
         columns={columns}
         data={data}
         pageIndex={pageIndex}
-        pageSize={PAGE_SIZE}
+        pageSize={pageSize}
         pageCount={pageCount}
         onPageChange={setPageIndex}
         isLoading={electionsQuery.isLoading}
@@ -74,6 +81,7 @@ export function MyElectionsPage() {
         }}
         emptyMessage="No estás designado como autoridad en ninguna elección."
       />
+      </div>
     </div>
   );
 }

@@ -41,6 +41,7 @@ export function buildActionsColumn<TData>(
             type="button"
             variant="ghost"
             size="icon"
+            className="size-8"
             aria-label="Ver detalle"
             onClick={() => actions.onView?.(row.original)}
           >
@@ -52,6 +53,7 @@ export function buildActionsColumn<TData>(
             type="button"
             variant="ghost"
             size="icon"
+            className="size-8"
             aria-label="Editar"
             onClick={() => actions.onEdit?.(row.original)}
           >
@@ -63,6 +65,7 @@ export function buildActionsColumn<TData>(
             type="button"
             variant="ghost"
             size="icon"
+            className="size-8"
             aria-label="Eliminar"
             onClick={() => actions.onDelete?.(row.original)}
           >

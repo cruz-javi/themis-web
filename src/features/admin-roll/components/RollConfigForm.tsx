@@ -105,7 +105,7 @@ export function RollConfigForm({ electionId, electionEstado }: RollConfigFormPro
               </p>
             ) : null}
             {form.formState.errors.profundidadArbol ? (
-              <p className="text-sm text-red-700">
+              <p className="text-sm text-destructive">
                 {form.formState.errors.profundidadArbol.message}
               </p>
             ) : null}
@@ -116,7 +116,7 @@ export function RollConfigForm({ electionId, electionEstado }: RollConfigFormPro
             <select
               id="elegibilidadFacultad"
               disabled={locked}
-              className="border-input h-9 w-full rounded-md border bg-transparent px-3 text-sm"
+              className="border-input h-9 w-full rounded-md border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
               {...form.register('elegibilidadFacultad')}
             >
               <option value="FICCT">FICCT</option>
@@ -150,7 +150,7 @@ export function RollConfigForm({ electionId, electionEstado }: RollConfigFormPro
             <select
               id="elegibilidadTipoUsuario"
               disabled={locked}
-              className="border-input h-9 w-full rounded-md border bg-transparent px-3 text-sm"
+              className="border-input h-9 w-full rounded-md border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
               {...form.register('elegibilidadTipoUsuario')}
             >
               <option value="ESTUDIANTE">Estudiante</option>
@@ -164,7 +164,7 @@ export function RollConfigForm({ electionId, electionEstado }: RollConfigFormPro
             <select
               id="elegibilidadEstadoAcademico"
               disabled={locked}
-              className="border-input h-9 w-full rounded-md border bg-transparent px-3 text-sm"
+              className="border-input h-9 w-full rounded-md border bg-card px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
               {...form.register('elegibilidadEstadoAcademico')}
             >
               <option value="ACTIVO">Activo</option>
@@ -173,7 +173,7 @@ export function RollConfigForm({ electionId, electionEstado }: RollConfigFormPro
           </div>
 
           {configureRoll.isError ? (
-            <p className="text-sm text-red-700" role="alert">
+            <p className="text-sm text-destructive" role="alert">
               {mutationErrorMessage(configureRoll.error)}
             </p>
           ) : null}

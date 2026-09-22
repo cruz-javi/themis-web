@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useFitPageSize } from '@/hooks/use-fit-page-size';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,13 +18,12 @@ import { UsersDataTable } from '../components/UsersDataTable';
 import { UserFormDrawer } from '../components/UserFormDrawer';
 import type { PlatformUserDto } from '../types/user.types';
 
-const PAGE_SIZE = 10;
-
 type DrawerState = { mode: 'create' } | { mode: 'edit'; user: PlatformUserDto } | null;
 
 export function UsersPage() {
   const [pageIndex, setPageIndex] = React.useState(0);
-  const usersQuery = useUsers({ page: pageIndex + 1, pageSize: PAGE_SIZE });
+  const { ref: tableRef, pageSize } = useFitPageSize();
+  const usersQuery = useUsers({ page: pageIndex + 1, pageSize: pageSize });
   const deleteUser = useDeleteUser();
 
   const [drawer, setDrawer] = React.useState<DrawerState>(null);
@@ -31,7 +31,13 @@ export function UsersPage() {
 
   const data = usersQuery.data?.data ?? [];
   const total = usersQuery.data?.total ?? 0;
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
+
+  React.useEffect(() => {
+    if (pageIndex > pageCount - 1) {
+      setPageIndex(pageCount - 1);
+    }
+  }, [pageIndex, pageCount]);
 
   function handleConfirmDelete() {
     if (!userToDelete) {
@@ -43,10 +49,10 @@ export function UsersPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex h-full min-h-0 flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Gestionar Usuarios</h1>
+          <h1 className="page-title">Gestionar Usuarios</h1>
           <p className="text-sm text-muted-foreground">
             Administradores, autoridades de registro y auditores del portal.
           </p>
@@ -57,16 +63,18 @@ export function UsersPage() {
         </Button>
       </div>
 
+      <div ref={tableRef} className="min-h-0 flex-1">
       <UsersDataTable
         data={data}
         pageIndex={pageIndex}
-        pageSize={PAGE_SIZE}
+        pageSize={pageSize}
         pageCount={pageCount}
         onPageChange={setPageIndex}
         isLoading={usersQuery.isLoading}
         onEdit={(user) => setDrawer({ mode: 'edit', user })}
         onDelete={(user) => setUserToDelete(user)}
       />
+      </div>
 
       <UserFormDrawer
         open={drawer !== null}
@@ -97,7 +105,7 @@ export function UsersPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           {deleteUser.isError ? (
-            <p className="text-sm text-red-700" role="alert">
+            <p className="text-sm text-destructive" role="alert">
               No se pudo eliminar la cuenta. Intenta de nuevo.
             </p>
           ) : null}

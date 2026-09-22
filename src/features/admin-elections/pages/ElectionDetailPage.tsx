@@ -43,7 +43,7 @@ export function ElectionDetailPage({ electionId }: ElectionDetailPageProps) {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">{election.nombre}</h1>
+          <h1 className="page-title">{election.nombre}</h1>
           <p className="text-sm text-muted-foreground">
             Estado: {election.estado} · {election.mecanismoCriptografico} · Umbral{' '}
             {election.umbralFirmas}

@@ -89,7 +89,7 @@ export function CheckpointPolicyForm({ electionId, electionEstado }: CheckpointP
               {...form.register('checkpointIntervalMinutes')}
             />
             {form.formState.errors.checkpointIntervalMinutes ? (
-              <p className="text-sm text-red-700">
+              <p className="text-sm text-destructive">
                 {form.formState.errors.checkpointIntervalMinutes.message}
               </p>
             ) : null}
@@ -109,14 +109,14 @@ export function CheckpointPolicyForm({ electionId, electionEstado }: CheckpointP
               {...form.register('rateLimitThresholdPerMinute')}
             />
             {form.formState.errors.rateLimitThresholdPerMinute ? (
-              <p className="text-sm text-red-700">
+              <p className="text-sm text-destructive">
                 {form.formState.errors.rateLimitThresholdPerMinute.message}
               </p>
             ) : null}
           </div>
 
           {configurePolicy.isError ? (
-            <p className="text-sm text-red-700" role="alert">
+            <p className="text-sm text-destructive" role="alert">
               {mutationErrorMessage(configurePolicy.error)}
             </p>
           ) : null}

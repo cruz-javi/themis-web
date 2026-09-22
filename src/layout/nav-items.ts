@@ -1,4 +1,4 @@
-import { ClipboardCheck, LayoutDashboard, Users, Vote } from 'lucide-react';
+import { ClipboardCheck, LayoutDashboard, ShieldCheck, Users, Vote } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { PlatformRole } from '@/features/auth/types/auth.types';
 
@@ -32,4 +32,10 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ['AUTORIDAD_REGISTRO'],
   },
   { label: 'Usuarios', to: '/admin/users', icon: Users, roles: ['SUPERUSUARIO'] },
+  {
+    label: 'Auditoría',
+    to: '/audit/elections',
+    icon: ShieldCheck,
+    roles: ['AUDITOR'],
+  },
 ];
