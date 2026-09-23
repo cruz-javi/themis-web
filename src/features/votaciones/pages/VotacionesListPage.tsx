@@ -1,8 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import { Lock, ShieldCheck, Link2, ChevronRight } from 'lucide-react';
+import { Lock, ShieldCheck, Link2, ChevronRight, Brain } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { Button } from '@/components/ui/button';
 import { usePublicElections } from '../hooks/use-public-elections';
 import { PublicHeader } from '../components/PublicHeader';
+import { AiForecastModal } from '@/features/ai-forecast/components/AiForecastModal';
 import type { PublicElectionStatus } from '../types/tally.types';
 
 const STATUS_META: Record<
@@ -119,35 +121,54 @@ export function VotacionesListPage() {
           {electionsQuery.data?.map((election) => {
             const meta = STATUS_META[election.estado];
             return (
-              <Link
-                key={election.id}
-                to="/votaciones/$electionId"
-                params={{ electionId: election.id }}
-                className="block"
-              >
+              <div key={election.id} className="block">
                 <Card
-                  className={`flex-row items-center gap-4 border-l-4 py-5 transition-all hover:-translate-y-0.5 hover:shadow-md ${meta.borderClass}`}
+                  className={`flex flex-col sm:flex-row sm:items-center gap-4 border-l-4 py-3 sm:py-5 transition-all hover:shadow-md ${meta.borderClass}`}
                 >
-                  <CardHeader className="flex-1 gap-1.5">
-                    <div className="flex flex-wrap items-center gap-2.5">
-                      <span className="font-semibold text-foreground">{election.nombre}</span>
-                      <span
-                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${meta.badgeClass}`}
-                      >
-                        {meta.live ? (
-                          <span className="size-1.5 rounded-full bg-brand motion-safe:animate-pulse" />
-                        ) : null}
-                        {meta.badge}
-                      </span>
-                    </div>
-                    <span className="text-[13.5px] text-muted-foreground">{meta.caption}</span>
-                  </CardHeader>
-                  <CardContent className="flex shrink-0 items-center gap-1 py-0 text-[13px] font-semibold text-muted-foreground">
-                    {meta.cta}
-                    <ChevronRight className="size-4" />
+                  <Link
+                    to="/votaciones/$electionId"
+                    params={{ electionId: election.id }}
+                    className="flex-1 w-full"
+                  >
+                    <CardHeader className="flex-1 gap-1.5 px-5 sm:px-6 py-2 sm:py-0">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <span className="font-semibold text-foreground hover:underline">{election.nombre}</span>
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold ${meta.badgeClass}`}
+                        >
+                          {meta.live ? (
+                            <span className="size-1.5 rounded-full bg-brand motion-safe:animate-pulse" />
+                          ) : null}
+                          {meta.badge}
+                        </span>
+                      </div>
+                      <span className="text-[13.5px] text-muted-foreground">{meta.caption}</span>
+                    </CardHeader>
+                  </Link>
+
+                  <CardContent className="flex shrink-0 items-center justify-between sm:justify-end gap-3 py-2 sm:py-0 px-5 sm:px-6">
+                    <AiForecastModal 
+                      defaultElectionId={election.id}
+                      lockedElection={true}
+                      trigger={
+                        <Button variant="outline" size="sm" className="h-8 gap-1.5 border-brand/20 bg-brand-soft text-brand hover:bg-brand hover:text-white transition-colors">
+                          <Brain className="size-3.5" />
+                          <span className="text-xs font-semibold">Predicción IA</span>
+                        </Button>
+                      }
+                    />
+
+                    <Link
+                      to="/votaciones/$electionId"
+                      params={{ electionId: election.id }}
+                      className="flex items-center gap-1 text-[13px] font-semibold text-muted-foreground hover:text-foreground"
+                    >
+                      {meta.cta}
+                      <ChevronRight className="size-4" />
+                    </Link>
                   </CardContent>
                 </Card>
-              </Link>
+              </div>
             );
           })}
         </div>

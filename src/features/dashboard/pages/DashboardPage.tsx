@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Brain } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
 import { useSession } from '@/features/auth/hooks/use-session';
 import { ROLE_LABELS } from '@/features/auth/lib/role-labels';
 import { NAV_ITEMS } from '@/layout/nav-items';
+import { AiForecastModal } from '@/features/ai-forecast/components/AiForecastModal';
 
 /**
  * Landing genérica post-login para los 4 roles. Sin datos falsos ni gráficos
@@ -69,6 +70,27 @@ export function DashboardPage() {
                 </Card>
               </Link>
             ))}
+            
+            {/* Boton del Dashboard Predictivo IA */}
+            {(session.role === 'ADMIN' || session.role === 'AUDITOR' || session.role === 'SUPERUSUARIO') && (
+              <AiForecastModal 
+                trigger={
+                  <button className="group block text-left h-full w-full">
+                    <Card className="h-full gap-0 py-0 transition-all group-hover:-translate-y-0.5 group-hover:border-brand/60 group-hover:shadow-md">
+                      <CardContent className="flex items-center gap-4 p-5">
+                        <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-brand-strong">
+                          <Brain className="size-5" />
+                        </span>
+                        <span className="flex-1 text-sm font-semibold text-foreground">
+                          Predictivo IA
+                        </span>
+                        <ArrowUpRight className="size-4 text-muted-foreground transition-colors group-hover:text-brand-strong" />
+                      </CardContent>
+                    </Card>
+                  </button>
+                }
+              />
+            )}
           </div>
         </section>
       ) : null}
